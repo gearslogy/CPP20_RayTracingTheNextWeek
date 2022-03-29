@@ -15,7 +15,7 @@ key:
 ## CP_02 BVH
 ![image](CP_02_BVH/image.jpg)
 Key:
-1. 关键点作者的BVH Node是在构造函数时候就递归划分了，所以是在递归构造函数
+1. BVH Node是在构造函数时候就递归划分了，所以是在递归构造函数
 2. hit超级简单，但是由于hit中访问BVH的left, right,left和right是递归构造的的BVH子Node,如下：
 ```c
 else{
