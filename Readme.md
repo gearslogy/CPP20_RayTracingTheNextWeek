@@ -77,3 +77,8 @@ BVH::BVH(std::vector<HittablePtr> &objects, size_t start, size_t end, double tim
 
 * BVH : 83s
 * Brute force : 450s
+
+## CP_03 Texture : a checker ground
+
+![image](CP_03_Texture/image.jpg)
+
