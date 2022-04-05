@@ -15,18 +15,18 @@ public:
         randFloat.resize(pointCount);
         std::ranges::generate(randFloat, [](){return random_double();});
 
-        perm_x.resize(pointCount);
-        perm_y.resize(pointCount);
-        perm_z.resize(pointCount);
+        permX.resize(pointCount);
+        permY.resize(pointCount);
+        permZ.resize(pointCount);
 
         auto iter = std::views::iota(0, pointCount);
-        perm_x.assign(std::begin(iter), std::end(iter));
-        perm_y.assign(std::begin(iter), std::end(iter));
-        perm_z.assign(std::begin(iter), std::end(iter));
+        permX.assign(std::begin(iter), std::end(iter));
+        permY.assign(std::begin(iter), std::end(iter));
+        permZ.assign(std::begin(iter), std::end(iter));
 
-        std::ranges::shuffle(perm_x, RandEngine::instance().generator);
-        std::ranges::shuffle(perm_y, RandEngine::instance().generator);
-        std::ranges::shuffle(perm_z, RandEngine::instance().generator);
+        std::ranges::shuffle(permX, RandEngine::instance().generator);
+        std::ranges::shuffle(permY, RandEngine::instance().generator);
+        std::ranges::shuffle(permZ, RandEngine::instance().generator);
     }
     template<typename T>
     inline double noise(const T& P) const {
@@ -37,9 +37,9 @@ public:
     }
 private:
     std::vector<double> randFloat;
-    std::vector<int> perm_x;
-    std::vector<int> perm_y;
-    std::vector<int> perm_z;
+    std::vector<int> permX;
+    std::vector<int> permY;
+    std::vector<int> permZ;
 };
 
 
