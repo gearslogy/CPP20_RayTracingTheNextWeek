@@ -82,3 +82,103 @@ BVH::BVH(std::vector<HittablePtr> &objects, size_t start, size_t end, double tim
 
 ![image](CP_03_Texture/image.jpg)
 
+
+## CP_04 PerlinBlock
+![image](CP_04_PerlinBlockNoise/image.jpg)
+
+More elegant implementation PerlinBlock of C++ 20 
+
+```C++
+#include <vector>
+#include <algorithm>
+#include <ranges>
+#include "Core/Utils.hpp"
+class Perlin {
+public:
+    static inline constexpr int pointCount = 256;
+    Perlin(){
+        randFloat.resize(pointCount);
+        std::ranges::generate(randFloat, [](){return random_double();});
+
+        perm_x.resize(pointCount);
+        perm_y.resize(pointCount);
+        perm_z.resize(pointCount);
+
+        auto iter = std::views::iota(0, pointCount);
+        perm_x.assign(std::begin(iter), std::end(iter));
+        perm_y.assign(std::begin(iter), std::end(iter));
+        perm_z.assign(std::begin(iter), std::end(iter));
+
+        std::ranges::shuffle(perm_x, RandEngine::instance().generator);
+        std::ranges::shuffle(perm_y, RandEngine::instance().generator);
+        std::ranges::shuffle(perm_z, RandEngine::instance().generator);
+    }
+    template<typename T>
+    inline double noise(const T& P) const {
+        auto i = static_cast<int>(4*P.x()) & 255;
+        auto j = static_cast<int>(4*P.y()) & 255;
+        auto k = static_cast<int>(4*P.z()) & 255;
+        return randFloat[perm_x[i] ^ perm_y[j] ^ perm_z[k]];
+    }
+private:
+    std::vector<double> randFloat;
+    std::vector<int> perm_x;
+    std::vector<int> perm_y;
+    std::vector<int> perm_z;
+};
+```
+Compared to the previous:
+
+```c
+#ifndef PERLIN_H
+#define PERLIN_H
+#include "rtweekend.h"
+class perlin {
+    public:
+        perlin() {
+            ranfloat = new double[point_count];
+            for (int i = 0; i < point_count; ++i) {
+                ranfloat[i] = random_double();
+            }
+            perm_x = perlin_generate_perm();
+            perm_y = perlin_generate_perm();
+            perm_z = perlin_generate_perm();
+        }
+        ~perlin() {
+            delete[] ranfloat;
+            delete[] perm_x;
+            delete[] perm_y;
+            delete[] perm_z;
+        }
+        double noise(const point3& p) const {
+            auto i = static_cast<int>(4*p.x()) & 255;
+            auto j = static_cast<int>(4*p.y()) & 255;
+            auto k = static_cast<int>(4*p.z()) & 255;
+            return ranfloat[perm_x[i] ^ perm_y[j] ^ perm_z[k]];
+        }
+    private:
+        static const int point_count = 256;
+        double* ranfloat;
+        int* perm_x;
+        int* perm_y;
+        int* perm_z;
+
+        static int* perlin_generate_perm() {
+            auto p = new int[point_count];
+            for (int i = 0; i < perlin::point_count; i++)
+                p[i] = i;
+            permute(p, point_count);
+            return p;
+        }
+
+        static void permute(int* p, int n) {
+            for (int i = n-1; i > 0; i--) {
+                int target = random_int(0, i);
+                int tmp = p[i];
+                p[i] = p[target];
+                p[target] = tmp;
+            }
+        }
+};
+#endif
+```
