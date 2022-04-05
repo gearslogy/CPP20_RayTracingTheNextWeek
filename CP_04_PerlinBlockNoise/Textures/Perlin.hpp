@@ -5,7 +5,6 @@
 #ifndef ONE_WEEKEND_PERLIN_H
 #define ONE_WEEKEND_PERLIN_H
 #include <vector>
-#include <algorithm>
 #include <ranges>
 #include "Core/Utils.hpp"
 class Perlin {
