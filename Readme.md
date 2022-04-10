@@ -183,3 +183,6 @@ class perlin {
 };
 #endif
 ```
+
+## CP_05 TextureMapping
+![image](CP_05_TextureMapping/image.jpg)
