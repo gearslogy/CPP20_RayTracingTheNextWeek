@@ -186,3 +186,6 @@ class perlin {
 
 ## CP_05 TextureMapping
 ![image](CP_05_TextureMapping/image.jpg)
+
+## CP_06 Constant Material
+![image](CP_06_ConstantMat/image.jpg)
