@@ -189,3 +189,7 @@ class perlin {
 
 ## CP_06 Constant Material
 ![image](CP_06_ConstantMat/image.jpg)
+
+dark background :
+
+![image](CP_06_ConstantMat/image2.jpg)
