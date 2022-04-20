@@ -193,3 +193,98 @@ class perlin {
 dark background :
 
 ![image](CP_06_ConstantMat/image2.jpg)
+
+
+## CP_07 Constant Material Bug Fixed
+
+At first I saw that this result must be wrong:
+
+![image](CP_07_ConstantMatBugFixed/MyRender.png)
+
+Then I went to Houdini and rendered it:
+
+![image](CP_07_ConstantMatBugFixed/HoudiniRender.png)
+
+
+ **What went wrong!!**  
+1. Lambertian reflected direction
+2. Random value
+
+
+So, the solution is:
+
+1. change lambertian.hpp :
+```C++
+auto scatterDirection = rec.normal + HemisphereScatter<Vec3>::surface(rec.normal);
+```
+to:
+```c++
+auto scatterDirection =    HemisphereScatter<Vec3>::surface(rec.normal);
+```
+2. change the random value gen:
+```C++
+template<typename vec_t>
+class SphereScatter{
+public:
+    // sample point inside sphere, use reject method
+    static inline auto interior(){
+        while (true) {
+            auto x = random_double(-1,1);
+            auto y = random_double(-1,1);
+            auto z = random_double(-1,1);
+            auto p = vec_t{x,y,z};
+            if (length_squared(p)>= 1) continue;
+            return p;
+        }
+    }
+    // sample point on unit sphere surface, // -------here to change--------------
+    static inline vec_t surface() {
+        auto a = random_double(0, 2*pi);
+        auto z = random_double(-1, 1);
+        auto r = sqrt(1 - z*z);
+        return vec_t(r*std::cos(a), r*std::sin(a), z);
+    }
+    
+    // Here is the wrong code,I've tested it. For one thing, Normalize is time-consuming and sampling is uneven  
+    //static inline vec_t surface() {
+    //    return normalize(interior());  
+    //}
+    
+    
+};
+template<typename vec_t>
+class HemisphereScatter{
+public:
+    // sample point in unit hemisphere
+    static inline auto surface(const vec_t& normal) {
+        vec_t dir{};
+        auto in_unit_sphere = SphereScatter<vec_t>::surface();
+        if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+            dir = in_unit_sphere;
+        else
+            dir = -in_unit_sphere;
+        return dir;
+    }
+};
+
+```
+3. change the random value generator:
+```C++
+template<typename T>
+class Singleton
+{
+public:
+    Singleton(Singleton const &) = delete;
+    Singleton & operator = (Singleton const &)= delete;
+    static T& instance(){
+        static thread_local T t;      // here!!! https://stackoverflow.com/questions/21237905/how-do-i-generate-thread-safe-uniform-random-numbers
+        return t;
+    }
+protected:
+    Singleton()= default;
+};
+```
+
+That makes sense:
+
+![image](CP_07_ConstantMatBugFixed/image.jpg)
