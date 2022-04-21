@@ -196,11 +196,15 @@ dark background :
 
 
 ## CP_07 Constant Material Bug Fixed
+
 Let's look at the correct results in the previous section
 
 ![image](CP_07_ConstantMatBugFixed/emissive_sphere.jpg)
 
 
+Rect hit:
+
+![image](CP_07_ConstantMatBugFixed/Rect.jpg)
 
 
 At first I saw that this result must be wrong:
