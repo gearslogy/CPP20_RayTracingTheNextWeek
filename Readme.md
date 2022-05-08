@@ -298,3 +298,7 @@ protected:
 That makes sense:
 
 ![image](CP_07_ConstantMatBugFixed/image.jpg)
+
+
+## change to GLM
+I'm too lazy to write the matrix
