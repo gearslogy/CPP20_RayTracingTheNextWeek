@@ -375,6 +375,23 @@ scene(scene.hip):
 ![image](CP_09_EmptyCornellBox/scene.png)
 
 
+```cpp
+inline auto cornell_box(){
+    HittableList world;
+    auto red   = std::make_shared<Lambertian>(Color(.65, .05, .05));
+    auto white = std::make_shared<Lambertian>(Color(.73, .73, .73));
+    auto green = std::make_shared<Lambertian>(Color(.12, .45, .15));
+    auto light = std::make_shared<Constant>(Color(15, 15, 15));
+
+    world.add(std::make_shared<YZ_Rect>(0,555,0,555,555, green)); // right
+    world.add(std::make_shared<YZ_Rect>(0,555,0,555,0, red)); // left
+    world.add(std::make_shared<XZ_Rect>(0, 555, 0, 555, 0, white)); // bottom
+    world.add(std::make_shared<XZ_Rect>(0, 555, 0, 555, 555, white)); //top
+    world.add(std::make_shared<XY_Rect>(0, 555, 0, 555, 555, white)); // front
+    world.add(std::make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
+    return world;
+}
+```
 
 
 1.  lambertian of hemisphere distribution :
@@ -390,5 +407,31 @@ auto scatterDirection =    HemisphereScatter<Vec3>::surface(rec.normal);
 auto scatterDirection =    rec.normal + SphereScatter<Vec3>::surface();
 ```
 ![image](CP_09_EmptyCornellBox/sphere_lambert_image.jpg)
+
+## CP_10 Cornell Box no transformation
+
+![image](CP_10_CornellBox_no_transformation/box.jpg)
+
+
+```cpp
+inline auto cornell_box_no_transformation(){
+    HittableList ret;
+    auto red   = std::make_shared<Lambertian>(Color(.65, .05, .05));
+    auto white = std::make_shared<Lambertian>(Color(.73, .73, .73));
+    auto green = std::make_shared<Lambertian>(Color(.12, .45, .15));
+    auto light = std::make_shared<Constant>(Color(15, 15, 15));
+
+    ret.add(std::make_shared<YZ_Rect>(0,555,0,555,555, green)); // right
+    ret.add(std::make_shared<YZ_Rect>(0,555,0,555,0, red)); // left
+    ret.add(std::make_shared<XZ_Rect>(0, 555, 0, 555, 0, white)); // bottom
+    ret.add(std::make_shared<XZ_Rect>(0, 555, 0, 555, 555, white)); //top
+    ret.add(std::make_shared<XY_Rect>(0, 555, 0, 555, 555, white)); // front
+    ret.add(std::make_shared<XZ_Rect>(213, 343, 227, 332, 554, light));
+    ret.add(std::make_shared<Box>(Vec3{130, 0, 65}, Vec3{295, 165, 230}, white));
+    ret.add(std::make_shared<Box>(Vec3{265, 0, 295}, Vec3{430, 330, 460}, white));
+    return ret;
+}
+```
+
 
 
