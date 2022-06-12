@@ -368,3 +368,27 @@ inline auto length_squared(expect_glm_vec auto vec){
     return glm::dot(vec,vec);
 }
 ```
+
+## CP_09 Empty Cornell box
+scene(scene.hip):
+
+![image](CP_09_EmptyCornellBox/scene.png)
+
+
+
+
+1.  lambertian of hemisphere distribution :
+```cpp
+auto scatterDirection =    HemisphereScatter<Vec3>::surface(rec.normal);
+```
+
+![image](CP_09_EmptyCornellBox/hemisphere_lambert_image.jpg)
+
+
+2. lambertian of sphere distribution
+```cpp
+auto scatterDirection =    rec.normal + SphereScatter<Vec3>::surface();
+```
+![image](CP_09_EmptyCornellBox/sphere_lambert_image.jpg)
+
+
