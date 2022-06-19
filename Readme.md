@@ -435,3 +435,74 @@ inline auto cornell_box_no_transformation(){
 
 
 
+## CP_11 TransformHittable of instance
+![image](CP_11_TransformHittable/box.jpg)
+
+> 正常思路Raytrace:
+1. 首先对一个物体进行变换，无非就是将物体的每顶点做矩阵变换，当物体的顶点非常多，那么这一步消耗比较大
+2. 然后我们对其Ray intersection
+> 正确套路Raytrace:
+3. 不变化物体，变换光线
+4. 然后对变换后的光线intersection的信息做一次矫正
+5. 这个对巨量集分布到场景中，渲染提升效率非常大。
+6. 这个消耗主要在相关intersection信息做的矫正，比如法线修正，p修正
+> 转换到矩阵运算：
+7. 理解教材中的，实际上教材是直接把矩阵运算直接写出来了，这种做法就是消耗非常小，
+如果用矩阵的话，比如沿着Y旋转，Y完全没有必要做矩阵运算,我的代码全部转换为矩阵操作，主要是代码简洁
+GLM全是在齐次坐标下完成。所以都是44矩阵。
+```cpp
+class Hittable_Rotate_Y: public Hittable{
+public:
+    Hittable_Rotate_Y(const HittablePtr &geo, float angle ): ptr{geo}, rad{ glm::radians(angle)}{
+        auto box = ptr->bbox(0,1);
+        auto boxMin = box.min();
+        auto boxMax = box.max();
+        rotMatrix = glm::rotate(rotMatrix, rad, Vec3{0,1,0});
+        Vec3 rotBoxMin = rotMatrix *  glm::vec4{rotBoxMin, 1.0f};
+        Vec3 rotBoxMax = rotMatrix *  glm::vec4{rotBoxMax, 1.0f};
+        auto newBoxMin = glm::min(boxMin, rotBoxMin);
+        auto newBoxMax = glm::min(boxMax, rotBoxMax);
+        calBox = AABB{newBoxMin, newBoxMax};
+    }
+    bool hit(const Ray &ray, double t_min, double t_max, HitRecord &rec) const override {
+        // reverse rotate ray
+        auto origin = ray.origin();
+        auto dir = ray.direction();
+        
+        auto inverseRotMatrix = glm::inverse(rotMatrix);
+        origin = inverseRotMatrix * glm::vec4{origin, 1.0f};
+        dir = inverseRotMatrix * glm::vec4{dir, 1.0f};
+        Ray rotated_r{origin, dir, ray.time()};
+        
+        if(!ptr->hit(rotated_r, t_min, t_max, rec))
+            return false;
+        auto p = rec.p;
+        auto normal = rec.normal;
+        rec.p = rotMatrix * glm::vec4{p,1.0f};
+        rec.normal = rotMatrix * glm::vec4{normal,1.0f};
+        rec.set_face_normal(rotated_r, normal);
+        return true;
+    }
+
+    AABB bbox(double time0, double time1) const override {
+        return calBox;
+    }
+
+    HittablePtr ptr;
+    float rad{0};
+    AABB calBox;
+    glm::mat4 rotMatrix{1.0f};
+};
+```
+
+![image](CP_11_TransformHittable/matrix.png)
+
+![image](CP_11_TransformHittable/reverse_ray_instersection.png)
+
+![image](CP_11_TransformHittable/scene.png)
+
+
+
+
+
+
