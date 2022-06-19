@@ -1,7 +1,7 @@
 ## C++ 20 Generic Method : Raytracing the next week
 * follow the author
-* may be with some extensions 
-
+* may be with some extensions
+* Ref: raytracing from ground up, PBRT v2
 ## CP_01 motion blur:
 
 ![image](CP_01_transform_motion_blur/image.jpg)
