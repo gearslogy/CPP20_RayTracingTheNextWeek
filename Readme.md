@@ -502,6 +502,86 @@ public:
 ![image](CP_11_TransformHittable/scene.png)
 
 
+## CP_12 Box Volume Rendering
+![image](CP_12_BoxVolumeRendering/box.jpg)
+
+其中最关键的三句话
+```cpp
+auto rayInsideDistance = rec2.t - rec1.t;  // 不用写*rayLength,因为我的direction是直接被normalized
+auto hitStepDistance =  - 1 / constantDensity * std::log(random_double()) ; // 这句话有意思的是，在体积内部的一个方向，rec1.t 和 rec2.t区间的一个任意判断距离， 当然跟density相关
+if (hitStepDistance > rayInsideDistance) // 只有在这个概率距离中，才能满足散射
+    return false;
+```
+如果说要带上step size，直接
+```cpp
+hitStepDistance *= stepSize; 
+```
+这样hit体积几率会更高
+
+
+
+```cpp
+#include "Core/Hittable.hpp"
+#include "Core/Material.hpp"
+#include "Core/GLM_Operators.hpp"
+class ConstantMedium: public Hittable{
+public:
+    ConstantMedium(const HittablePtr& bound, MaterialPtr mat, double density):boundary{bound}, phase_function{mat},constantDensity{density}    {
+    }
+
+    bool hit(const Ray &ray, double t_min, double t_max, HitRecord &rec) const override {
+
+        const bool enableDebug = true;
+        const bool debugging = enableDebug && random_double() < 0.00001;
+        HitRecord rec1;
+        HitRecord rec2;
+
+        if(!boundary->hit(ray, -infinity, infinity, rec1))
+            return false;
+
+        if(!boundary->hit(ray, rec1.t + 0.0001, infinity, rec2)){
+            return false;
+        }
+
+        if (rec1.t < t_min) rec1.t = t_min;
+        if (rec2.t > t_max) rec2.t = t_max;
+
+        if(rec1.t >= rec2.t) return false;
+        if (rec1.t < 0)
+            rec1.t = 0;
+
+        auto rayInsideDistance = rec2.t - rec1.t;  
+        auto hitStepDistance =  - 1 / constantDensity * std::log(random_double()) ; 
+        if (hitStepDistance > rayInsideDistance) 
+            return false;
+
+        if(debugging){
+            //std::cout << "rayInsideDistance:" << rayInsideDistance << " hitStepDistance:" << hitStepDistance << std::endl;
+        }
+
+        rec.t = rec1.t + hitStepDistance ;
+        rec.p = ray.at(rec.t);
+        rec.normal = Vec3{1,0,0};  // arbitrary
+        rec.front_face = true;     // also arbitrary
+        rec.matPtr = phase_function;
+        return true;
+    }
+
+    AABB bbox(double time0, double time1) const override {
+        return boundary->bbox(time0, time1);
+    }
+    MaterialPtr phase_function;
+private:
+    double constantDensity;
+    HittablePtr boundary;
+};
+
+
+
+
+
+
+```
 
 
 
